@@ -10,26 +10,26 @@
 
 ## Задание на работу с объектами в js
 
-* Функция-конструктор **`Animal(name)`**:
+*  **`Animal`**:
 
-    * свойства: `this.name`, `this.hunger = 0`
-    * методы через `Animal.prototype`:
-
-        * `increaseHunger()` — + случайное 1–10
-        * `feed()` — hunger=0
-* Конструкторы-наследники:
-
-    * **`Cow(name)`**, **`Sheep(name)`**
-    * должны использовать `Animal.call(this, name)` и унаследовать прототип
-    * переопределяют `feed()`: сначала вызвать родительский, потом лог «Мууу!» / «Беее!»
-* Функция-конструктор **`Farm()`**:
-
-    * поле `this.animals = []`
+    * поля: `name` (строка), `hunger` (число, 0..∞, старт 0)
     * методы:
 
-        * `addAnimal(animal)`
-        * `startLife()` (через `setInterval` каждые 2с)
-        * `stopLife()`
+        * `increaseHunger()`: увеличить `hunger` на случайное целое от 1 до 10
+        * `feed()`: установить `hunger = 0`
+* Наследники **`Cow`** и **`Sheep`**:
+
+    * переопределяют `feed()` и после базовой логики выводят в консоль «Мууу!»/«Беее!» соответственно
+*  **`Farm`**:
+
+    * поля: `animals` (массив), `intervalId` (идентификатор таймера или `null`)
+    * методы:
+
+        * `addAnimal(animal)` — добавить животное
+        * `startLife()` — раз в 2 секунды вызывает `increaseHunger()` у всех животных и логирует их состояние
+
+            * если у животного `hunger >= 100`, оно удаляется (лог «X убежал(а) с фермы!»)
+        * `stopLife()` — останавливает интервал
 
 
 ## Пример работы
@@ -57,17 +57,26 @@ setTimeout(() => farm.stopLife(), 14000);
 
 ## Задание на работу с объектами в js
 
-* **`Client(name, balance)`**:
+*  **`Client`**:
 
-    * методы: `deposit(amount)`, `withdraw(amount)`
-* **`VIPClient(name, balance)`**:
+    * поля: `name` (строка), `balance` (число)
+    * методы:
 
-    * наследует от Client
-    * переопределяет `deposit(amount)` → добавляет бонус `10%` (округлять вниз)
-* **`Bank()`**:
+        * `deposit(amount)` — пополнить, лог `Имя пополнил на X. Баланс: Y`
+        * `withdraw(amount)` — списать, лог `Имя снял X. Баланс: Y`
+* Наследник **`VIPClient`**:
 
-    * хранит `this.clients = []`
-    * методы: `addClient`, `startInterest(rate)`, `stopInterest`
+    * переопределяет `deposit(amount)`: добавляет бонус `10%` от суммы (округлить вниз)
+    * после пополнения логирует `VIP-бонус: +B`
+*  **`Bank`**:
+
+    * поля: `clients` (массив), `intervalId`
+    * методы:
+
+        * `addClient(client)`
+        * `startInterest(ratePercent)` — каждые 3 секунды начислять процент всем, у кого `balance > 0`
+            * лог `Начислены проценты Имя: +profit. Баланс: ...`
+        * `stopInterest()`
 
 
 ## Пример работы
@@ -77,6 +86,7 @@ const bank = new Bank();
 bank.addClient(new Client("Аня", 100));
 bank.addClient(new VIPClient("Игорь", 200));
 
+// каждые 10 сек
 bank.startInterest(5);
 
 setTimeout(() => bank.clients[0].deposit(50), 2000);
@@ -94,21 +104,32 @@ setTimeout(() => bank.stopInterest(), 12000);
 
 ## Задание на работу с объектами в js 
 
-* **`Warrior(name, hp=100)`**:
+*  **`Warrior`**:
 
-    * методы: `attack()` → случай 1..20, `takeDamage(dmg)`, `isAlive()`
-* **`Knight(name, hp)`**:
+    * поля: `name`, `hp` (по умолчанию 100)
+    * методы:
 
-    * наследует Warrior
-    * переопределяет `takeDamage(dmg)` → урон уменьшается до `Math.floor(dmg*0.7)`
-* **`Archer(name, hp)`**:
+        * `attack()` — возвращает урон: случайное целое 1..20
+        * `takeDamage(dmg)` — уменьшает hp, лог `Имя получил X урона. HP: Y`
+        * `isAlive()` — `hp > 0`
+* Наследник **`Knight`**:
 
-    * наследует Warrior
-    * переопределяет `attack()` → 30% шанс критического (x2)
-* **`Arena()`**:
+    * переопределяет `takeDamage(dmg)`: фактический урон `floor(dmg * 0.7)`, минимум 1
+* Наследник **`Archer`**:
 
-    * хранит `warriors = []`
-    * `addWarrior(w)`, `startBattle()`, `stopBattle()`
+    * переопределяет `attack()`: с вероятностью 30% удвоенный урон (логировать «критический выстрел»)
+* **`Arena`**:
+
+    * поля: `warriors` (массив), `intervalId`
+    * методы:
+
+        * `addWarrior(w)`
+        * `startBattle()` — раз в 1 сек: выбирает случайного атакующего и случайного защитника (не равны), наносит урон
+
+            * если кто-то умер — удаляет его из массива (логировать)
+            * когда остался один — объявить победителя и остановиться
+        * `stopBattle()`
+
 
 
 ### Пример работы
@@ -123,3 +144,6 @@ arena.startBattle();
 
 setTimeout(() => arena.stopBattle(), 20000);
 ```
+
+
+
