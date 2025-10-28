@@ -1,0 +1,15 @@
+.answer-item{
+    background-color: lightgray;
+    padding: 10px;
+    text-align: center;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.answer-item.correct{
+    background-color: chartreuse;
+}
+
+.answer-item.incorrect{
+    background-color: red;
+}
